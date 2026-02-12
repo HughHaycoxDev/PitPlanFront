@@ -49,73 +49,73 @@ export default function HomePage() {
       Authorization: `Bearer ${token}`,
     };
 
-    const loadData = async () => {
-      try {
-        // 1. Fetch series list
-        const seriesList = await fetch("http://127.0.0.1:8000/series", {
-          headers,
-        }).then((r) => r.json());
+    // const loadData = async () => {
+    //   try {
+    //     // 1. Fetch series list
+    //     const seriesList = await fetch("http://127.0.0.1:8000/series", {
+    //       headers,
+    //     }).then((r) => r.json());
 
-        const allEvents: any[] = [];
+    //     const allEvents: any[] = [];
 
-        // 2. Fetch each series schedule
-        for (const series of seriesList) {
-          const seasonId = series.season_id;
+    //     // 2. Fetch each series schedule
+    //     for (const series of seriesList) {
+    //       const seasonId = series.season_id;
 
-          try {
-            const schedule = await fetch(
-              `http://127.0.0.1:8000/series/${seasonId}/schedule`,
-              { headers }
-            ).then((r) => r.json());
+    //       try {
+    //         const schedule = await fetch(
+    //           `http://127.0.0.1:8000/series/${seasonId}/schedule`,
+    //           { headers }
+    //         ).then((r) => r.json());
 
-            const mapped = schedule.map((race: any) => ({
-              title:
-                race.series_name ||
-                race.event_name ||
-                "Race",
-              start: race.start_date,
-              raw: race,
-            }));
+    //         const mapped = schedule.map((race: any) => ({
+    //           title:
+    //             race.series_name ||
+    //             race.event_name ||
+    //             "Race",
+    //           start: race.start_date,
+    //           raw: race,
+    //         }));
 
-            allEvents.push(...mapped);
-          } catch (err) {
-            console.error(`Schedule load failed for season ${seasonId}`, err);
-          }
-        }
+    //         allEvents.push(...mapped);
+    //       } catch (err) {
+    //         console.error(`Schedule load failed for season ${seasonId}`, err);
+    //       }
+    //     }
 
-        // 3. Load special events
-        const special = await fetch("http://127.0.0.1:8000/events/special", {
-          headers,
-        }).then((r) => r.json());
+    //     // 3. Load special events
+    //     const special = await fetch("http://127.0.0.1:8000/events/special", {
+    //       headers,
+    //     }).then((r) => r.json());
 
-        const mappedSpecial = special.map((ev: any) => ({
-          title: ev.event_name || "Special Event",
-          start: ev.start_date,
-          raw: ev,
-        }));
+    //     const mappedSpecial = special.map((ev: any) => ({
+    //       title: ev.event_name || "Special Event",
+    //       start: ev.start_date,
+    //       raw: ev,
+    //     }));
 
-        allEvents.push(...mappedSpecial);
+    //     allEvents.push(...mappedSpecial);
 
-        // 4. Sort events
-        allEvents.sort(
-          (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
-        );
+    //     // 4. Sort events
+    //     allEvents.sort(
+    //       (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
+    //     );
 
-        setEvents(allEvents);
+    //     setEvents(allEvents);
 
-        // 5. Determine next upcoming race
-        const now = new Date();
-        const upcoming = allEvents.find(
-          (e) => new Date(e.start) > now
-        );
+    //     // 5. Determine next upcoming race
+    //     const now = new Date();
+    //     const upcoming = allEvents.find(
+    //       (e) => new Date(e.start) > now
+    //     );
 
-        setNextRace(upcoming || null);
-      } catch (err) {
-        console.error("Failed loading events:", err);
-      }
-    };
-
-    loadData();
+    //     setNextRace(upcoming || null);
+    //   } catch (err) {
+    //     console.error("Failed loading events:", err);
+    //   }
+    // };
+// 
+  //   loadData();
   }, []);
 
   return (
