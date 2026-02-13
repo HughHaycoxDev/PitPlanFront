@@ -1,0 +1,19 @@
+<div class="flex bg-gray-100">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="flex-1 p-10 flex flex-col gap-8">
+
+    <!-- Welcome -->
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        Welcome<span *ngIf="user">, {{ user.display_name }}</span>
+      </h1>
+      <p class="text-gray-600">
+        Here's your upcoming iRacing schedule.
+      </p>
+    </div>
+
+  </main>
+
+</div>
