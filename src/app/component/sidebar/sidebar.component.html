@@ -15,12 +15,18 @@
       Home
     </a>
 
-    <a routerLink="/teams"
-       routerLinkActive="text-blue-600"
-       class="flex items-center gap-3 text-gray-700 hover:text-blue-600">
+    <p class="flex items-center gap-3 text-gray-700 hover:text-blue-600">
       <i class="bi bi-people"></i>
       Teams
-    </a>
+    </p>
+
+    <ul class="flex flex-col gap-1 ml-6">
+      @for (team of teams; track team.team_id) {
+        <li class="text-gray-600 text-sm">
+          {{ team.team_name }}
+        </li>
+      }
+    </ul>
   </nav>
 
 </aside>
