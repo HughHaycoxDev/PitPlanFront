@@ -4,7 +4,7 @@ import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
-    { path: '**', redirectTo: 'login'},
+    { path: '', redirectTo: '/login', pathMatch: 'full'},
     { path: 'login', component: LoginComponent },
     { path: 'auth/callback', component: AuthCallbackComponent},
     { path: 'dashboard', component: DashboardComponent},
