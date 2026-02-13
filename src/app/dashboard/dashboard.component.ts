@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,40 +14,16 @@ export class DashboardComponent implements OnInit {
   events: any[] = [];
   nextRace: any = null;
 
-  ngOnInit(): void {
-    const token = localStorage.getItem('token');
+  constructor(private auth: AuthService) {}
 
-    if (!token) {
-      console.warn('No token found in localStorage.');
+  ngOnInit(): void {
+    const username = this.auth.getUsername();
+
+    if (!username) {
+      console.warn('No user found in JWT.');
       return;
     }
 
-    const payload = this.decodeJWT(token);
-
-    if (payload?.sub) {
-      this.user = { display_name: payload.sub };
-    }
-  }
-
-  private decodeJWT(token: string): any {
-    try {
-      const base64 = token.split('.')[1]
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-
-      const json = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) =>
-            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-          )
-          .join('')
-      );
-
-      return JSON.parse(json);
-    } catch (err) {
-      console.error('JWT decode error:', err);
-      return null;
-    }
+    this.user = { display_name: username };
   }
 }

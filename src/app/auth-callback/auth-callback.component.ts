@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-auth-callback',
@@ -9,14 +10,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 
 export class AuthCallbackComponent implements OnInit{
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private auth: AuthService) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
 
       if (token) {
-        localStorage.setItem('auth_token', token);
+        this.auth.setToken(token);
 
         // Redirect to dashboard
         this.router.navigate(['/dashboard']);
