@@ -27,15 +27,20 @@
         <tbody>
           <tr *ngFor="let dayIndex of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]">
             <td class="day-label">{{ dayIndex + 1 }}</td>
-            <td *ngFor="let month of tableViewData" 
+            <td *ngFor="let month of tableViewData; let colIdx = index" 
                 class="day-cell"
                 [class.has-events]="month.days[dayIndex]?.hasEvents"
                 [class.empty]="!month.days[dayIndex]?.day"
-                [class.today]="month.days[dayIndex]?.isToday">
+                [class.today]="month.days[dayIndex]?.isToday"
+                [class.event-continuation]="isEventContinuation(month.days[dayIndex]?.events, month.days[dayIndex]?.date)">
               <div *ngIf="month.days[dayIndex]?.day" class="cell-content">
-                <div class="cell-day">{{ month.days[dayIndex]?.day }}</div>
-                <div *ngIf="month.days[dayIndex]?.hasEvents" class="cell-events">
-                  <div *ngFor="let event of month.days[dayIndex]?.events" class="event-dot" title="{{ event.title }}"></div>
+                <!-- <div class=\"cell-day\">{{ month.days[dayIndex]?.day }}</div> -->
+                <div *ngIf="month.days[dayIndex]?.hasEvents && !isEventContinuation(month.days[dayIndex]?.events, month.days[dayIndex]?.date)" class="cell-events">
+                  <div *ngFor="let event of month.days[dayIndex]?.events" 
+                       class="event-block"
+                       title="{{ event.title }}">
+                    <span class="event-title">{{ event.title }}</span>
+                  </div>
                 </div>
               </div>
             </td>

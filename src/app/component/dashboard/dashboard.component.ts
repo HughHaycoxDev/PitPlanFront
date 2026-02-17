@@ -121,12 +121,9 @@ export class DashboardComponent implements OnInit {
       const daysArray = [];
       for (let day = 1; day <= maxDays; day++) {
         if (day <= daysInMonth) {
-          const date = new Date(startYear, startMonth + i, day);
+          const date = new Date(Date.UTC(startYear, startMonth + i, day));
           const dateStr = date.toISOString().split('T')[0];
-          const dayEvents = this.events.filter(event => {
-            const eventStart = new Date(event.start).toISOString().split('T')[0];
-            return eventStart === dateStr;
-          });
+          const dayEvents = this.getEventsForDay(dateStr);
 
           daysArray.push({
             day,
@@ -155,7 +152,49 @@ export class DashboardComponent implements OnInit {
       });
     }
 
+    console.log(monthsData)
     this.tableViewData = monthsData;
+  }
+
+  private getEventsForDay(dateStr: string): any[] {
+    return this.events.filter(event => {
+      const eventStart = new Date(event.start).toISOString().split('T')[0];
+      const eventEnd = new Date(event.end).toISOString().split('T')[0];
+      return dateStr >= eventStart && dateStr <= eventEnd;
+    });
+  }
+
+  isEventFirstDay(event: any, dateStr: string): boolean {
+    const eventStart = new Date(event.start).toISOString().split('T')[0];
+    return dateStr === eventStart;
+  }
+
+  isEventLastDay(event: any, dateStr: string): boolean {
+    const eventEnd = new Date(event.end).toISOString().split('T')[0];
+    return dateStr === eventEnd;
+  }
+
+  isEventContinuation(events: any[], dateStr: string): boolean {
+    if (!events || events.length === 0) return false;
+    return events.some(event => !this.isEventFirstDay(event, dateStr));
+  }
+
+  calculateEventSpan(event: any, dateStr: string, monthDays: any[]): number {
+    const eventStart = new Date(event.start).toISOString().split('T')[0];
+    const eventEnd = new Date(event.end).toISOString().split('T')[0];
+    
+    // Find the day index in the current month for this date
+    const currentDayIndex = monthDays.findIndex(d => d.date === dateStr);
+    
+    if (currentDayIndex === -1) return 1;
+    
+    let span = 1;
+    for (let i = currentDayIndex + 1; i < monthDays.length; i++) {
+      if (!monthDays[i].date || monthDays[i].date > eventEnd) break;
+      span++;
+    }
+    
+    return span;
   }
 
   handleEventClick(arg: any) {
