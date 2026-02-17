@@ -16,6 +16,10 @@ export class AuthService {
     localStorage.removeItem(this.storageKey);
   }
 
+  logout(): void {
+    this.clearToken();
+  }
+
   getPayload(token?: string): any {
     const t = token ?? this.getToken();
     if (!t) return null;
