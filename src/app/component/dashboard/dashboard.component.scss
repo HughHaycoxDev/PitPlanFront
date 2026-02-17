@@ -1,0 +1,164 @@
+:host {
+	display: block;
+}
+
+// Table View Styles (4 Months as Columns, Days as Rows)
+.table-view-container {
+	height: calc(100vh - 10rem);
+	overflow: auto;
+	background: white;
+	border-radius: 0.5rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+
+	thead {
+		position: sticky;
+		top: 0;
+		background: #667eea ;
+		color: white;
+		z-index: 10;
+	}
+
+	th {
+		padding: 1rem 0.5rem;
+		font-weight: 600;
+		text-align: center;
+		border-bottom: 2px solid #e5e7eb;
+
+		&.day-header {
+			background: #374151;
+			min-width: 50px;
+		}
+
+		&.month-header {
+			min-width: 120px;
+		}
+	}
+
+	tbody tr:hover {
+		background: #f9fafb;
+	}
+
+	td {
+		// padding: 0.75rem 0.5rem;
+		text-align: center;
+		border: 1px solid #e5e7eb;
+		height: 20px;
+
+		&.day-label {
+			font-weight: 600;
+			background: #f3f4f6;
+			min-width: 50px;
+			position: sticky;
+			left: 0;
+			z-index: 5;
+		}
+
+		&.day-cell {
+			vertical-align: middle;
+			position: relative;
+			background: white;
+			transition: all 0.2s ease;
+
+			&.empty {
+				background: #fafbfc;
+				color: #d1d5db;
+			}
+
+			&.has-events {
+				background: linear-gradient(135deg, #eff6ff 0%, #f0f4ff 100%);
+				border-color: #667eea;
+				border-width: 2px;
+			}
+
+			&.event-continuation {
+				background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+				border-color: #1d4ed8;
+				border-width: 2px;
+			}
+
+			&.today {
+				background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+				border-color: #f59e0b;
+				border-width: 2px;
+
+				.cell-day {
+					font-weight: 700;
+					color: #d97706;
+				}
+			}
+
+			&:hover {
+				background: #f0f4ff;
+				box-shadow: inset 0 0 0 2px #667eea;
+			}
+		}
+	}
+}
+
+.cell-events {
+	display: grid;
+	gap: 0.25rem;
+	justify-content: center;
+	flex-wrap: wrap;
+	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+	width: 100%;
+	padding: 2px 0;
+}
+
+.event-block {
+	background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+	color: white;
+	padding: 2px 4px;
+	border-radius: 3px;
+	font-size: 0.75rem;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-block;
+	min-width: 40px;
+	text-align: center;
+
+	&:hover {
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+		box-shadow: 0 2px 4px rgba(37, 99, 235, 0.4);
+	}
+
+	&.event-start {
+		border-radius: 3px 0 0 3px;
+	}
+
+	&.event-end {
+		border-radius: 0 3px 3px 0;
+	}
+}
+
+.event-title {
+	display: inline-block;
+	max-width: 100%;
+}
+
+.event-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	display: inline-block;
+	cursor: pointer;
+	transition: transform 0.2s ease;
+
+	&:hover {
+		transform: scale(1.3);
+	}
+}
+
+
+
