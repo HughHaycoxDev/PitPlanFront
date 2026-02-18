@@ -3,10 +3,12 @@
   <app-sidebar></app-sidebar>
 
   <main class="flex-1 p-4">
-    <!-- Welcome -->
     <div class="mb-4">
       <h1 class="text-3xl font-bold text-gray-900">
-        Welcome<span *ngIf="user">, {{ user.display_name }}</span>
+        Welcome
+        @if (user) {
+        <span>{{user.display_name}}</span>
+        }
       </h1>
       <p class="text-gray-600">
         Here's your upcoming iRacing schedule.
@@ -19,33 +21,52 @@
         <thead>
           <tr>
             <th class="day-header">Day</th>
-            <th *ngFor="let month of tableViewData" class="month-header">
+            @for (month of tableViewData; track month.year + '-' + month.month) {
+            <th class="month-header">
               {{ month.month }} {{ month.year }}
             </th>
+            }
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let dayIndex of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]">
-            <td class="day-label">{{ dayIndex + 1 }}</td>
-            <td *ngFor="let month of tableViewData; let colIdx = index" 
-                class="day-cell"
-                [class.has-events]="month.days[dayIndex]?.hasEvents"
-                [class.empty]="!month.days[dayIndex]?.day"
-                [class.today]="month.days[dayIndex]?.isToday"
-                [class.event-continuation]="isEventContinuation(month.days[dayIndex]?.events, month.days[dayIndex]?.date)">
-              <div *ngIf="month.days[dayIndex]?.day" class="cell-content">
-                <!-- <div class=\"cell-day\">{{ month.days[dayIndex]?.day }}</div> -->
-                <div *ngIf="month.days[dayIndex]?.hasEvents && !isEventContinuation(month.days[dayIndex]?.events, month.days[dayIndex]?.date)" class="cell-events">
-                  <div *ngFor="let event of month.days[dayIndex]?.events" 
-                       class="event-block"
-                       title="{{ event.title }}">
-                    <span class="event-title">{{ event.title }}</span>
-                  </div>
+
+        <tbody class="calendar-body">
+
+          <!-- First row: day 1 and month columns (month cells span all days) -->
+          <tr>
+            <td class="day-label">1</td>
+
+            @for (month of tableViewData; track month.year + '-' + month.month) {
+            <td class="day-cell" [attr.rowspan]="31">
+              <div class="month-grid">
+                <!-- Background day rows (will create the vertical grid) -->
+
+
+                @for (day of month.days; track $index) {
+                <div class="day-row"></div>
+                }
+                @for (event of getPositionedEventsForMonth(month); track event.id) {
+                <div class="event-block" [style.top.px]="event.top" [style.height.px]="event.height"
+                  (click)="handleEventClick(event)">
+
+                  {{ event.title }}
+
                 </div>
+                }
+
               </div>
             </td>
+            }
           </tr>
+
+          <!-- Remaining day label rows (days 2..31) -->
+          @for (i of days; let idx = $index; track idx) {
+            <tr>
+              <td class="day-label">{{ idx + 2 }}</td>
+            </tr>
+          }
+
         </tbody>
+
       </table>
     </div>
   </main>

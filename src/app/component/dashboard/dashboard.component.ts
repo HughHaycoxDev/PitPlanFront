@@ -21,6 +21,8 @@ export class DashboardComponent implements OnInit {
   viewMode: 'multiMonth' | 'yearGrid' | 'tableView' = 'tableView';
   yearGridData: any[] = [];
   tableViewData: any[] = [];
+  dayRowHeight = 28;
+  days = Array.from({length: 31});
   
   calendarOptions: CalendarOptions = {};
   
@@ -39,7 +41,6 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadEvents(): void {
-    const api = 'http://localhost:8000/events/';
     this.eventsService.getEvents().subscribe({
       next: (data) => {
         this.events = data.map((ev) => ({
@@ -214,5 +215,37 @@ export class DashboardComponent implements OnInit {
       'multiMonth': 'Multi-Month'
     };
     return labels[this.viewMode];
+  }
+
+  getPositionedEventsForMonth(monthData: any) {
+    const positioned: any[] = [];
+
+    const monthStart = new Date(monthData.year, monthData.monthNumber - 1, 1);
+    const monthEnd = new Date(monthData.year, monthData.monthNumber, 0);
+
+    this.events.forEach(event => {
+
+      const start = new Date(event.start);
+      const end = new Date(event.end);
+
+      if (end < monthStart || start > monthEnd) return;
+
+      const effectiveStart = start < monthStart ? monthStart : start;
+      const effectiveEnd = end > monthEnd ? monthEnd : end;
+
+      const startDay = effectiveStart.getDate() - 1;
+      const endDay = effectiveEnd.getDate() - 1;
+
+      const duration = endDay - startDay + 1;
+
+      positioned.push({
+        id: event.id,
+        title: event.title,
+        top: startDay * this.dayRowHeight,
+        height: duration * this.dayRowHeight
+      });
+    });
+
+    return positioned;
   }
 }
