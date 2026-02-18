@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiEvent } from '../models/api-event.model';
 import { AuthService } from './auth.service';
+import { Register, RegisterReply } from '../models/register.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventsService {
@@ -17,5 +18,14 @@ export class EventsService {
       : new HttpHeaders();
 
     return this.http.get<ApiEvent[]>(this.api, { headers });
+  }
+
+  register(body: Register): Observable<RegisterReply> {
+    const token = this.auth.getToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    return this.http.post<RegisterReply>(this.api + "register", body, {headers})
   }
 }
