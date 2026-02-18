@@ -24,6 +24,7 @@
 		z-index: 10;
 	}
 
+
 	th {
 		padding: 1rem 0.5rem;
 		font-weight: 600;
@@ -48,7 +49,7 @@
 		// padding: 0.75rem 0.5rem;
 		text-align: center;
 		border: 1px solid #e5e7eb;
-		height: 20px;
+		height: 28px;
 
 		&.day-label {
 			font-weight: 600;
@@ -162,3 +163,49 @@
 
 
 
+.month-column {
+  padding: 0;
+  position: relative;
+}
+
+.month-grid {
+	position: relative;
+	width: 100%;
+	/* total height = day row height * max days (31) so absolute-positioned events
+		 can be placed using top/height in pixels */
+	height: calc(28px * 31);
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.day-row {
+  height: 28px; // must match dayRowHeight
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+/* Ensure event blocks inside the month grid are positioned absolutely
+	 and span vertically from start to end via inline top/height styles. */
+.month-grid .event-block {
+	position: absolute;
+	left: 4px;
+	right: 4px;
+	background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+	color: white;
+	font-size: 0.75rem;
+	padding: 4px;
+	border-radius: 6px;
+	font-weight: 500;
+	overflow: hidden;
+	cursor: pointer;
+	box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+	z-index: 12;
+	display: block;
+	text-align: center;
+}
+
+/* Make sure the containing table cells don't clip absolute children */
+.day-cell {
+	overflow: visible;
+	vertical-align: top;
+}
