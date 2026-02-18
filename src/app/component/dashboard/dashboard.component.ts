@@ -1,6 +1,7 @@
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { EventDetailsSidebarComponent } from '../event-details-sidebar/event-details-sidebar.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../utilities/services/auth.service';
 import { ApiEvent } from '../../utilities/models/api-event.model';
@@ -10,7 +11,7 @@ import { User } from '../../utilities/models/user.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SidebarComponent, CommonModule, FullCalendarModule],
+  imports: [SidebarComponent, EventDetailsSidebarComponent, CommonModule, FullCalendarModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
@@ -20,9 +21,12 @@ export class DashboardComponent implements OnInit {
   yearGridData: any[] = [];
   tableViewData: any[] = [];
   dayRowHeight = 28;
-  days = Array.from({length: 31});
+  days = Array.from({length: 30});
   
   calendarOptions: CalendarOptions = {};
+  
+  selectedEvent: any = null;
+  eventDetailsSidebarOpen = false;
   
   constructor(private auth: AuthService, private eventsService: EventsService) {}
 
@@ -51,9 +55,14 @@ export class DashboardComponent implements OnInit {
         // Map API event objects into calendar-friendly shapes where needed.
         this.events = data.map((ev) => ({
           id: ev.id,
-          title: ev.event_name,
-          start: ev.start_date,
-          end: ev.end_date,
+          event_name: ev.event_name,
+          start_date: ev.start_date,
+          end_date: ev.end_date,
+          event_description: ev.event_description,
+          duration_minutes: ev.duration_minutes,
+          track: ev.track,
+          cars: ev.cars,
+          time_slots: ev.time_slots,
           allDay: true,
           extendedProps: { raw: ev },
         }));
@@ -92,7 +101,7 @@ export class DashboardComponent implements OnInit {
         // matches start date only (not multi-day spans) for the year grid
         // summary — the table view logic handles multi-day ranges.
         const dayEvents = this.events.filter(event => {
-          const eventStart = new Date(event.start).toISOString().split('T')[0];
+          const eventStart = new Date(event.start_date).toISOString().split('T')[0];
           return eventStart === dateStr;
         });
 
@@ -171,14 +180,31 @@ export class DashboardComponent implements OnInit {
     // Return events that overlap the given date string (inclusive).
     // Both start and end are normalized to YYYY-MM-DD for safe comparison.
     return this.events.filter(event => {
-      const eventStart = new Date(event.start).toISOString().split('T')[0];
-      const eventEnd = new Date(event.end).toISOString().split('T')[0];
+      const eventStart = new Date(event.start_date).toISOString().split('T')[0];
+      const eventEnd = new Date(event.end_date).toISOString().split('T')[0];
       return dateStr >= eventStart && dateStr <= eventEnd;
     });
   }
 
-  handleEventClick(arg: any) {
-    console.log('event clicked', arg.event);
+  handleEventClick(event: any) {
+    this.selectedEvent = event;
+    this.eventDetailsSidebarOpen = true;
+  }
+
+  onEventDetailsSidebarClose(): void {
+    this.eventDetailsSidebarOpen = false;
+    this.selectedEvent = null;
+  }
+
+  onEventDetailsApply(data: {
+    event: any;
+    selectedTeam: any;
+    selectedCar: any;
+    selectedTimeSlot: any;
+  }): void {
+    console.log('Event registration applied:', data);
+    // TODO: Send the registration data to the backend API
+    this.onEventDetailsSidebarClose();
   }
 
   getPositionedEventsForMonth(monthData: any) {
@@ -190,8 +216,8 @@ export class DashboardComponent implements OnInit {
     this.events.forEach(event => {
 
       // Normalize start/end to Date objects for comparisons
-      const start = new Date(event.start);
-      const end = new Date(event.end);
+      const start = new Date(event.start_date);
+      const end = new Date(event.end_date);
 
       // Skip events that fall completely outside the requested month
       if (end < monthStart || start > monthEnd) return;
@@ -209,7 +235,14 @@ export class DashboardComponent implements OnInit {
       // Return the positioned event used by the month table renderer
       positioned.push({
         id: event.id,
-        title: event.title,
+        event_name: event.event_name,
+        start_date: event.start_date,
+        end_date: event.end_date,
+        event_description: event.event_description,
+        duration_minutes: event.duration_minutes,
+        track: event.track,
+        cars: event.cars,
+        time_slots: event.time_slots,
         top: startDay * this.dayRowHeight,
         height: duration * this.dayRowHeight
       });

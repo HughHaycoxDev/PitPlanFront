@@ -48,7 +48,7 @@
                 <div class="event-block" [style.top.px]="event.top" [style.height.px]="event.height"
                   (click)="handleEventClick(event)">
 
-                  {{ event.title }}
+                  {{ event.event_name }}
 
                 </div>
                 }
@@ -70,5 +70,13 @@
       </table>
     </div>
   </main>
+
+  <!-- Event Details Sidebar -->
+  <app-event-details-sidebar
+    [isOpen]="eventDetailsSidebarOpen"
+    [event]="selectedEvent"
+    (close)="onEventDetailsSidebarClose()"
+    (apply)="onEventDetailsApply($event)"
+  ></app-event-details-sidebar>
 
 </div>
