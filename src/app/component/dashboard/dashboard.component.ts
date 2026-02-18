@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
   yearGridData: any[] = [];
   tableViewData: any[] = [];
   dayRowHeight = 28;
-  days = Array.from({length: 31});
+  days = Array.from({length: 30});
   
   calendarOptions: CalendarOptions = {};
   

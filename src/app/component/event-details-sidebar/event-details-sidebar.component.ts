@@ -95,7 +95,7 @@ export class EventDetailsSidebarComponent implements OnInit {
         event_id: this.event.id,
         team_id: this.selectedTeam?.team_id,
         time_slot: this.selectedTimeSlot?.slot_time,
-        car_id: this.selectedCar?.car_id,
+        car_id: this.selectedCar?.id,
         user_id: 341977
     } as Register
 
