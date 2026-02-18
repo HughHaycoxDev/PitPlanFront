@@ -3,22 +3,20 @@ import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../utilities/services/auth.service';
-import { HttpClientModule } from '@angular/common/http';
 import { ApiEvent } from '../../utilities/models/api-event.model';
 import { EventsService } from '../../utilities/services/events.service';
 import { CalendarOptions } from '@fullcalendar/core/index.js';
+import { User } from '../../utilities/models/user.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [SidebarComponent, CommonModule, FullCalendarModule, HttpClientModule],
+  imports: [SidebarComponent, CommonModule, FullCalendarModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  user: any = null;
+  user!: User;
   events: any[] = [];
-  nextRace: any = null;
-  viewMode: 'multiMonth' | 'yearGrid' | 'tableView' = 'tableView';
   yearGridData: any[] = [];
   tableViewData: any[] = [];
   dayRowHeight = 28;
@@ -29,20 +27,28 @@ export class DashboardComponent implements OnInit {
   constructor(private auth: AuthService, private eventsService: EventsService) {}
 
   ngOnInit(): void {
+    // Get the username from the JWT token
     const username = this.auth.getUsername();
 
+    // If the token doesn't contain a username, log and stop initialization
     if (!username) {
       console.warn('No user found in JWT.');
       return;
     }
 
+    // Set the minimal user object used by the template and kick off events load
     this.user = { display_name: username };
     this.loadEvents();
   }
 
+  /**
+   * Loads the Events and maps them to add them to the calendarOptions
+   */
   private loadEvents(): void {
+    // Subscribe to events stream and map results for calendar and views
     this.eventsService.getEvents().subscribe({
       next: (data) => {
+        // Map API event objects into calendar-friendly shapes where needed.
         this.events = data.map((ev) => ({
           id: ev.id,
           title: ev.event_name,
@@ -52,17 +58,15 @@ export class DashboardComponent implements OnInit {
           extendedProps: { raw: ev },
         }));
 
-        console.log(this.events)
-
-        // Set calendar options with events
+        // Update FullCalendar options with the loaded events. We merge onto
+        // existing options to preserve any previously set configuration.
         this.calendarOptions = {
           ...this.calendarOptions,
           events: this.events,
         };
 
-        // Generate year grid data
+        // Rebuild derived views after events arrive
         this.generateYearGridData();
-        // Generate table view data
         this.generateTableViewData();
       },
       error: (err) => console.error('Failed to load events', err),
@@ -81,7 +85,12 @@ export class DashboardComponent implements OnInit {
       const daysArray = [];
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
+        // Use ISO date string (YYYY-MM-DD) for consistent comparisons
         const dateStr = date.toISOString().split('T')[0];
+
+        // Find events that start exactly on this date. This intentionally
+        // matches start date only (not multi-day spans) for the year grid
+        // summary — the table view logic handles multi-day ranges.
         const dayEvents = this.events.filter(event => {
           const eventStart = new Date(event.start).toISOString().split('T')[0];
           return eventStart === dateStr;
@@ -122,6 +131,7 @@ export class DashboardComponent implements OnInit {
       const daysArray = [];
       for (let day = 1; day <= maxDays; day++) {
         if (day <= daysInMonth) {
+          // Use UTC to avoid timezone shifts when converting to ISO date
           const date = new Date(Date.UTC(startYear, startMonth + i, day));
           const dateStr = date.toISOString().split('T')[0];
           const dayEvents = this.getEventsForDay(dateStr);
@@ -131,9 +141,11 @@ export class DashboardComponent implements OnInit {
             date: dateStr,
             hasEvents: dayEvents.length > 0,
             events: dayEvents,
+            // Mark whether this date matches today's date (local)
             isToday: dateStr === today.toISOString().split('T')[0]
           });
         } else {
+          // Pad remaining slots for months with fewer than `maxDays`
           daysArray.push({
             day: null,
             date: null,
@@ -152,12 +164,12 @@ export class DashboardComponent implements OnInit {
         days: daysArray
       });
     }
-
-    console.log(monthsData)
     this.tableViewData = monthsData;
   }
 
   private getEventsForDay(dateStr: string): any[] {
+    // Return events that overlap the given date string (inclusive).
+    // Both start and end are normalized to YYYY-MM-DD for safe comparison.
     return this.events.filter(event => {
       const eventStart = new Date(event.start).toISOString().split('T')[0];
       const eventEnd = new Date(event.end).toISOString().split('T')[0];
@@ -165,56 +177,8 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  isEventFirstDay(event: any, dateStr: string): boolean {
-    const eventStart = new Date(event.start).toISOString().split('T')[0];
-    return dateStr === eventStart;
-  }
-
-  isEventLastDay(event: any, dateStr: string): boolean {
-    const eventEnd = new Date(event.end).toISOString().split('T')[0];
-    return dateStr === eventEnd;
-  }
-
-  isEventContinuation(events: any[], dateStr: string): boolean {
-    if (!events || events.length === 0) return false;
-    return events.some(event => !this.isEventFirstDay(event, dateStr));
-  }
-
-  calculateEventSpan(event: any, dateStr: string, monthDays: any[]): number {
-    const eventStart = new Date(event.start).toISOString().split('T')[0];
-    const eventEnd = new Date(event.end).toISOString().split('T')[0];
-    
-    // Find the day index in the current month for this date
-    const currentDayIndex = monthDays.findIndex(d => d.date === dateStr);
-    
-    if (currentDayIndex === -1) return 1;
-    
-    let span = 1;
-    for (let i = currentDayIndex + 1; i < monthDays.length; i++) {
-      if (!monthDays[i].date || monthDays[i].date > eventEnd) break;
-      span++;
-    }
-    
-    return span;
-  }
-
   handleEventClick(arg: any) {
     console.log('event clicked', arg.event);
-  }
-
-  toggleViewMode() {
-    const views: Array<'multiMonth' | 'yearGrid' | 'tableView'> = ['tableView', 'yearGrid', 'multiMonth'];
-    const currentIndex = views.indexOf(this.viewMode);
-    this.viewMode = views[(currentIndex + 1) % views.length];
-  }
-
-  getViewModeLabel(): string {
-    const labels: Record<string, string> = {
-      'tableView': '4-Month Grid',
-      'yearGrid': 'Year Overview',
-      'multiMonth': 'Multi-Month'
-    };
-    return labels[this.viewMode];
   }
 
   getPositionedEventsForMonth(monthData: any) {
@@ -225,19 +189,24 @@ export class DashboardComponent implements OnInit {
 
     this.events.forEach(event => {
 
+      // Normalize start/end to Date objects for comparisons
       const start = new Date(event.start);
       const end = new Date(event.end);
 
+      // Skip events that fall completely outside the requested month
       if (end < monthStart || start > monthEnd) return;
 
+      // Clip multi-day events to the bounds of the month being rendered
       const effectiveStart = start < monthStart ? monthStart : start;
       const effectiveEnd = end > monthEnd ? monthEnd : end;
 
+      // Convert to 0-based day indices 
       const startDay = effectiveStart.getDate() - 1;
       const endDay = effectiveEnd.getDate() - 1;
 
       const duration = endDay - startDay + 1;
 
+      // Return the positioned event used by the month table renderer
       positioned.push({
         id: event.id,
         title: event.title,
