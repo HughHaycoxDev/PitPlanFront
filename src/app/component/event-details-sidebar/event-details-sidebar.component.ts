@@ -6,6 +6,8 @@ import { Team } from '../../utilities/models/team.model';
 import { TeamsService } from '../../utilities/services/teams/teams.service';
 import { Car, TimeSlot } from '../../utilities/models/api-event.model';
 import { EventsService } from '../../utilities/services/events.service';
+import { RacePlanService } from '../../utilities/services/race-plan.service';
+import { RacePlan } from '../../utilities/models/race-plan.model';
 
 @Component({
   selector: 'app-event-details-sidebar',
@@ -36,7 +38,7 @@ export class EventDetailsSidebarComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private teamsService: TeamsService, private eventsService: EventsService) {}
+  constructor(private teamsService: TeamsService, private eventsService: EventsService, private racePlanService: RacePlanService) {}
 
   ngOnInit(): void {
     this.loadTeams();
@@ -105,5 +107,22 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   onClose(): void {
     this.close.emit();
+  }
+
+  onCreateRacePlan(): void {
+
+    const racePlan = {
+      team_id: this.selectedTeam?.team_id,
+    } as RacePlan
+
+    this.racePlanService.createRacePlan(racePlan).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (err) => {
+        console.error('Failed to create race plan', err);
+      }
+    });
+
   }
 }

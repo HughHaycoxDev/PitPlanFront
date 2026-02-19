@@ -112,13 +112,20 @@
     <!-- Apply button -->
     @if(!loading && event) {
         <div class="sidebar-footer">
-        <button
-            class="apply-btn"
-            (click)="onApply()"
-            [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
-        >
-            Apply
-        </button>
+          <button
+              class="apply-btn"
+              (click)="onApply()"
+              [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
+          >
+              Apply
+          </button>
+          <button
+              class="apply-btn"
+              (click)="onCreateRacePlan()"
+              [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
+          >
+              Create Race Plan
+          </button>
         </div>
     }
   </div>
