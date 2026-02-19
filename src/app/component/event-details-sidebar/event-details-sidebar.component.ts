@@ -113,6 +113,8 @@ export class EventDetailsSidebarComponent implements OnInit {
 
     const racePlan = {
       team_id: this.selectedTeam?.team_id,
+      car_id: this.selectedCar?.id,
+      time_slot: this.selectedTimeSlot?.slot_time
     } as RacePlan
 
     this.racePlanService.createRacePlan(racePlan).subscribe({
