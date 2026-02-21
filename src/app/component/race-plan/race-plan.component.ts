@@ -9,7 +9,6 @@ import { Component } from '@angular/core';
 export class RacePlanComponent {
   constructor() {
     const navigation = window.history.state;
-    console.log('Navigated to RacePlanComponent with state:', navigation);
     console.log(navigation.racePlans);
   }
 }

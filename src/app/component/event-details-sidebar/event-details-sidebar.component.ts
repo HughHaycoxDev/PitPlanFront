@@ -132,15 +132,8 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   onViewRacePlan(): void {
 
-    const racePlan = {
-      team_id: this.selectedTeam?.team_id,
-      car_id: this.selectedCar?.id,
-      time_slot: this.selectedTimeSlot?.slot_time
-    } as RacePlan
-
     this.racePlanService.getRacePlans().subscribe({
       next: (data) => {
-        console.log(data);
         this.router.navigate(['/race-plan'], {
            state: { racePlans: data } 
           });
