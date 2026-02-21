@@ -18,4 +18,13 @@ export class RacePlanService {
 
     return this.http.post<RacePlan>(this.api + "create", body, {headers})
   }
+
+  getRacePlans(): Observable<RacePlan[]> {
+    const token = this.auth.getToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    return this.http.get<RacePlan[]>(this.api + "list", {headers})
+  }
 }

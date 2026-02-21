@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './race-plan.component.scss',
 })
 export class RacePlanComponent {
-
+  constructor() {
+    const navigation = window.history.state;
+    console.log('Navigated to RacePlanComponent with state:', navigation);
+    console.log(navigation.racePlans);
+  }
 }

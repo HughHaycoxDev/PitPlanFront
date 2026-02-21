@@ -8,6 +8,7 @@ import { Car, TimeSlot } from '../../utilities/models/api-event.model';
 import { EventsService } from '../../utilities/services/events.service';
 import { RacePlanService } from '../../utilities/services/race-plan.service';
 import { RacePlan } from '../../utilities/models/race-plan.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-details-sidebar',
@@ -28,6 +29,7 @@ export class EventDetailsSidebarComponent implements OnInit {
   }>();
 
   teams: Team[] = [];
+  racePlans: RacePlan[] = [];
   cars: Car[] = [];
   timeSlots: TimeSlot[] = [];
 
@@ -38,7 +40,7 @@ export class EventDetailsSidebarComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private teamsService: TeamsService, private eventsService: EventsService, private racePlanService: RacePlanService) {}
+  constructor(private teamsService: TeamsService, private eventsService: EventsService, private racePlanService: RacePlanService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadTeams();
@@ -123,6 +125,28 @@ export class EventDetailsSidebarComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to create race plan', err);
+      }
+    });
+
+  }
+
+  onViewRacePlan(): void {
+
+    const racePlan = {
+      team_id: this.selectedTeam?.team_id,
+      car_id: this.selectedCar?.id,
+      time_slot: this.selectedTimeSlot?.slot_time
+    } as RacePlan
+
+    this.racePlanService.getRacePlans().subscribe({
+      next: (data) => {
+        console.log(data);
+        this.router.navigate(['/race-plan'], {
+           state: { racePlans: data } 
+          });
+      },
+      error: (err) => {
+        console.error('Failed to get race plans', err);
       }
     });
 

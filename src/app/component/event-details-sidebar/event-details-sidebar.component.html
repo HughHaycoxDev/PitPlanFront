@@ -126,6 +126,13 @@
           >
               Create Race Plan
           </button>
+                    <button
+              class="apply-btn"
+              (click)="onViewRacePlan()"
+              [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
+          >
+              View Race Plan
+          </button>
         </div>
     }
   </div>
