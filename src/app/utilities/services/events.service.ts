@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiEvent } from '../models/api-event.model';
 import { AuthService } from './auth.service';
-import { Register, RegisterReply } from '../models/register.model';
+import { Register, RegisterReply, RegistrationResponse } from '../models/register.model';
 
 @Injectable({ providedIn: 'root' })
 export class EventsService {
@@ -11,21 +11,25 @@ export class EventsService {
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
-  getEvents(): Observable<ApiEvent[]> {
+  private getHeaders(): HttpHeaders {
     const token = this.auth.getToken();
-    const headers = token
+    return token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : new HttpHeaders();
+  }
 
-    return this.http.get<ApiEvent[]>(this.api, { headers });
+  getEvents(): Observable<ApiEvent[]> {
+    return this.http.get<ApiEvent[]>(this.api, { headers: this.getHeaders() });
   }
 
   register(body: Register): Observable<RegisterReply> {
-    const token = this.auth.getToken();
-    const headers = token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : new HttpHeaders();
+    return this.http.post<RegisterReply>(this.api + "register", body, { headers: this.getHeaders() });
+  }
 
-    return this.http.post<RegisterReply>(this.api + "register", body, {headers})
+  getRegistrationsByEventAndTeam(eventId: number, teamId: number): Observable<RegistrationResponse[]> {
+    return this.http.get<RegistrationResponse[]>(
+      `${this.api}registrations/event/${eventId}/team/${teamId}`,
+      { headers: this.getHeaders() }
+    );
   }
 }
