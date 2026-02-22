@@ -170,9 +170,6 @@ export class EventDetailsSidebarComponent implements OnInit {
             }
       });
     }
-
-    
-
   }
 
   // View registrations functionality
