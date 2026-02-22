@@ -6,6 +6,9 @@ import { Team } from '../../utilities/models/team.model';
 import { TeamsService } from '../../utilities/services/teams/teams.service';
 import { Car, TimeSlot } from '../../utilities/models/api-event.model';
 import { EventsService } from '../../utilities/services/events.service';
+import { RacePlanService } from '../../utilities/services/race-plan.service';
+import { RacePlan } from '../../utilities/models/race-plan.model';
+import { Router } from '@angular/router';
 import { AuthService } from '../../utilities/services/auth.service';
 
 interface RegistrationsByTeam {
@@ -38,6 +41,7 @@ export class EventDetailsSidebarComponent implements OnInit {
   selectedTeam: Team | null = null;
   selectedCar: Car | null = null;
   selectedTimeSlot: TimeSlot | null = null;
+  racePlan: RacePlan | null = null;
 
   loading = false;
   error: string | null = null;
@@ -50,7 +54,9 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   constructor(private teamsService: TeamsService, 
     private eventsService: EventsService,
-    private auth: AuthService) {}
+    private auth: AuthService, 
+    private racePlanService: RacePlanService, 
+    private router: Router) {}
 
   ngOnInit(): void {
     this.loadTeams();
@@ -83,6 +89,16 @@ export class EventDetailsSidebarComponent implements OnInit {
       // Load cars for this team from the event
       // Assuming event.cars is an array of Car objects
       this.cars = this.event.cars || [];
+      // Search if any race plan exists for this team and event to let the user view it
+      this.racePlanService.getRacePlanByTeamAndEvent(this.selectedTeam.team_id, this.event.id).subscribe({
+        next: (data) => {
+          console.log(data);
+          this.racePlan = data;
+        },
+        error: (err) => {
+          this.racePlan = null;
+        }
+      });
     }
   }
 
@@ -113,6 +129,50 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   onClose(): void {
     this.close.emit();
+  }
+
+  onCreateRacePlan(): void {
+
+    const racePlan = {
+      team_id: this.selectedTeam?.team_id,
+      car_id: this.selectedCar?.id,
+      time_slot: this.selectedTimeSlot?.slot_time,
+      event_id: this.event.id
+    } as RacePlan
+
+    this.racePlanService.createRacePlan(racePlan).subscribe({
+            next: (data) => {
+              this.router.navigate(['/race-plan'], {
+                state: { racePlans: data } 
+                });
+            },
+            error: (err) => {
+              console.error('Failed to create race plan', err);
+            }
+    });
+
+  }
+
+  onViewRacePlan(): void {
+
+    if (!this.selectedTeam) {
+      this.error = 'Team cannot be retrieved';
+      return;
+    } else {
+      this.racePlanService.getRacePlanByTeamAndEvent(this.selectedTeam.team_id, this.event.id).subscribe({
+            next: (data) => {
+              this.router.navigate(['/race-plan'], {
+                state: { racePlans: data } 
+                });
+            },
+            error: (err) => {
+              console.error('Failed to get race plans', err);
+            }
+      });
+    }
+
+    
+
   }
 
   // View registrations functionality
