@@ -6,7 +6,7 @@
   <div class="sidebar-content">
     <!-- Header -->
     <div class="sidebar-header">
-      <h2>Event Details</h2>
+      <h2>{{ showRegistrations ? 'Event Registrations' : 'Event Details' }}</h2>
       <button class="close-btn" (click)="onClose()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -26,100 +26,167 @@
         </div>
     }
 
-    <!-- Sidebar body -->
-    <div class="sidebar-body" *ngIf="!loading && event">
-      <!-- Event name -->
-      <div class="event-info">
-        <h3 class="event-name">{{ event.event_name }}</h3>
-        <p class="event-date">
-          {{ event.start_date | date: 'MMM dd, yyyy' }}
-          @if (event.end_date !== event.start_date) {
-          - {{ event.end_date | date: 'MMM dd, yyyy' }}
-          }
-        </p>
-        @if (event.event_description) {
-        <p class="event-description">{{ event.event_description }}</p>
-        }
-        @if (event.track) {
-        <p class="event-track"><strong>Track:</strong> {{ event.track.track_name }}</p>
-        <p class="event-track"><strong>Track Layout:</strong> {{ event.track.config_name }}</p>
-        }
-        <!-- TODO Maybe add the image of the track??? -->
-      </div>
-
-      <!-- Team Selection -->
-      <div class="form-group">
-        <label for="team-select">Select Team</label>
-        <select
-          id="team-select"
-          [(ngModel)]="selectedTeam"
-          (change)="onTeamChange()"
-          class="form-control"
-        >
-          <option [ngValue]="null">-- Choose a team --</option>
-          @for (team of teams; track team.team_id) {
-          <option [ngValue]="team">{{ team.team_name }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Car Selection -->
-      <div class="form-group" [class.disabled]="!selectedTeam">
-        <label for="car-select">Select Car</label>
-        <select
-          id="car-select"
-          [(ngModel)]="selectedCar"
-          (change)="onCarChange()"
-          [disabled]="!selectedTeam"
-          class="form-control"
-        >
-          <option [ngValue]="null">
-            @if (selectedTeam) {
-            -- Choose a car --
-            } @else {
-            -- Select a team first --
-            }
-          </option>
-          @for (car of cars; track car.id) {
-          <option [ngValue]="car">{{ car.car_name }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Time Slot Selection -->
-      <div class="form-group" [class.disabled]="!selectedCar">
-        <label for="timeslot-select">Select Time Slot</label>
-        <select
-          id="timeslot-select"
-          [(ngModel)]="selectedTimeSlot"
-          [disabled]="!selectedCar"
-          class="form-control"
-        >
-          <option [ngValue]="null">
-            @if (selectedCar) {
-            -- Choose a time slot --
-            } @else {
-            -- Select a car first --
-            }
-          </option>
-          @for (slot of timeSlots; track slot.slot_time) {
-          <option [ngValue]="slot">{{ slot.slot_time }}</option>
-          }
-        </select>
-      </div>
-    </div>
-
-    <!-- Apply button -->
-    @if(!loading && event) {
-        <div class="sidebar-footer">
-        <button
-            class="apply-btn"
-            (click)="onApply()"
-            [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
-        >
-            Apply
+    <!-- Registrations View -->
+    @if(showRegistrations) {
+      <!-- Back button -->
+      <div class="sidebar-body">
+        <button class="back-btn" (click)="onBackToRegistration()">
+          ← Back to Registration
         </button>
+      </div>
+
+      <!-- Registrations Loading -->
+      @if(registrationsLoading) {
+        <div class="loading">
+          <p>Loading registrations...</p>
         </div>
+      }
+
+      <!-- Registrations Error -->
+      @if(registrationsError) {
+        <div class="error-message">
+          <p>{{ registrationsError }}</p>
+        </div>
+      }
+
+      <!-- Registrations List -->
+      @if(!registrationsLoading && registrationsByTeam.length === 0) {
+        <div class="sidebar-body">
+          <p class="no-registrations">No registrations found for your teams.</p>
+        </div>
+      }
+
+      @if(!registrationsLoading && registrationsByTeam.length > 0) {
+        <div class="registrations-container">
+          @for (teamGroup of registrationsByTeam; track teamGroup.team.team_id) {
+            <div class="team-section">
+              <h3 class="team-name">{{ teamGroup.team.team_name }}</h3>
+              <div class="registrations-list">
+                @for (registration of teamGroup.registrations; track registration.id) {
+                  <div class="registration-card">
+                    <div class="registration-info">
+                      <p class="user-id">
+                        <strong>Name:</strong> {{ registration.display_name }}</p>
+                      <p class="car-info">
+                        <strong>Car:</strong> {{ registration.car.car_name || 'N/A' }}
+                      </p>
+                      <p class="timeslot-info">
+                        <strong>Time Slot:</strong> {{ registration.time_slot.slot_time | date: 'MMM dd, yyyy HH:mm' }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Original Registration View -->
+    @if(!showRegistrations && !loading && event) {
+      <!-- Sidebar body -->
+      <div class="sidebar-body">
+        <!-- Event name -->
+        <div class="event-info">
+          <h3 class="event-name">{{ event.event_name }}</h3>
+          <p class="event-date">
+            {{ event.start_date | date: 'MMM dd, yyyy' }}
+            @if (event.end_date !== event.start_date) {
+            - {{ event.end_date | date: 'MMM dd, yyyy' }}
+            }
+          </p>
+          @if (event.event_description) {
+          <p class="event-description">{{ event.event_description }}</p>
+          }
+          @if (event.track) {
+          <p class="event-track"><strong>Track:</strong> {{ event.track.track_name }}</p>
+          <p class="event-track"><strong>Track Layout:</strong> {{ event.track.config_name }}</p>
+          }
+          <!-- TODO Maybe add the image of the track??? -->
+        </div>
+
+        <!-- View Registrations Button -->
+        <div class="view-registrations-btn-container">
+          <button class="view-registrations-btn" (click)="onViewRegistrations()">
+            View All Registrations
+          </button>
+        </div>
+
+        <!-- Team Selection -->
+        <div class="form-group">
+          <label for="team-select">Select Team</label>
+          <select
+            id="team-select"
+            [(ngModel)]="selectedTeam"
+            (change)="onTeamChange()"
+            class="form-control"
+          >
+            <option [ngValue]="null">-- Choose a team --</option>
+            @for (team of teams; track team.team_id) {
+            <option [ngValue]="team">{{ team.team_name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Car Selection -->
+        <div class="form-group" [class.disabled]="!selectedTeam">
+          <label for="car-select">Select Car</label>
+          <select
+            id="car-select"
+            [(ngModel)]="selectedCar"
+            (change)="onCarChange()"
+            [disabled]="!selectedTeam"
+            class="form-control"
+          >
+            <option [ngValue]="null">
+              @if (selectedTeam) {
+              -- Choose a car --
+              } @else {
+              -- Select a team first --
+              }
+            </option>
+            @for (car of cars; track car.id) {
+            <option [ngValue]="car">{{ car.car_name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Time Slot Selection -->
+        <div class="form-group" [class.disabled]="!selectedCar">
+          <label for="timeslot-select">Select Time Slot</label>
+          <select
+            id="timeslot-select"
+            [(ngModel)]="selectedTimeSlot"
+            [disabled]="!selectedCar"
+            class="form-control"
+          >
+            <option [ngValue]="null">
+              @if (selectedCar) {
+              -- Choose a time slot --
+              } @else {
+              -- Select a car first --
+              }
+            </option>
+            @for (slot of timeSlots; track slot.slot_time) {
+            <option [ngValue]="slot">{{ slot.slot_time }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Apply button -->
+      @if(!loading && event) {
+          <div class="sidebar-footer">
+          <button
+              class="apply-btn"
+              (click)="onApply()"
+              [disabled]="!selectedTeam || !selectedCar || !selectedTimeSlot"
+          >
+              Apply
+          </button>
+          </div>
+      }
     }
   </div>
 </div>

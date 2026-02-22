@@ -1,4 +1,4 @@
-import { Register } from './../../utilities/models/register.model';
+import { Register, RegistrationResponse } from './../../utilities/models/register.model';
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,12 @@ import { Team } from '../../utilities/models/team.model';
 import { TeamsService } from '../../utilities/services/teams/teams.service';
 import { Car, TimeSlot } from '../../utilities/models/api-event.model';
 import { EventsService } from '../../utilities/services/events.service';
+import { AuthService } from '../../utilities/services/auth.service';
+
+interface RegistrationsByTeam {
+  team: Team;
+  registrations: RegistrationResponse[];
+}
 
 @Component({
   selector: 'app-event-details-sidebar',
@@ -36,7 +42,15 @@ export class EventDetailsSidebarComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private teamsService: TeamsService, private eventsService: EventsService) {}
+  // View registrations
+  showRegistrations = false;
+  registrationsLoading = false;
+  registrationsError: string | null = null;
+  registrationsByTeam: RegistrationsByTeam[] = [];
+
+  constructor(private teamsService: TeamsService, 
+    private eventsService: EventsService,
+    private auth: AuthService) {}
 
   ngOnInit(): void {
     this.loadTeams();
@@ -85,18 +99,12 @@ export class EventDetailsSidebarComponent implements OnInit {
   }
 
   onApply(): void {
-    this.apply.emit({
-      event: this.event,
-      selectedTeam: this.selectedTeam,
-      selectedCar: this.selectedCar,
-      selectedTimeSlot: this.selectedTimeSlot,
-    });
     const register = {
         event_id: this.event.id,
         team_id: this.selectedTeam?.team_id,
         time_slot: this.selectedTimeSlot?.slot_time,
         car_id: this.selectedCar?.id,
-        user_id: 341977
+        user_id: this.auth.getId(),
     } as Register
 
     this.eventsService.register(register).subscribe();
@@ -105,5 +113,54 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   onClose(): void {
     this.close.emit();
+  }
+
+  // View registrations functionality
+  onViewRegistrations(): void {
+    this.showRegistrations = true;
+    this.loadRegistrations();
+  }
+
+  onBackToRegistration(): void {
+    this.showRegistrations = false;
+    this.registrationsByTeam = [];
+    this.registrationsError = null;
+  }
+
+  private loadRegistrations(): void {
+    if (!this.event) return;
+
+    this.registrationsLoading = true;
+    this.registrationsError = null;
+
+    // Load registrations for each team the user is in
+    const teamIds = this.teams.map(t => t.team_id);
+    const registrationPromises: Promise<{ team: Team; registrations: RegistrationResponse[] }>[] = [];
+
+    for (const team of this.teams) {
+      const promise = new Promise<{ team: Team; registrations: RegistrationResponse[] }>((resolve, reject) => {
+        this.eventsService.getRegistrationsByEventAndTeam(this.event.id, team.team_id).subscribe({
+          next: (registrations) => {
+            resolve({ team, registrations });
+          },
+          error: (err) => {
+            console.error(`Failed to load registrations for team ${team.team_id}`, err);
+            resolve({ team, registrations: [] }); // Resolve with empty array on error
+          },
+        });
+      });
+      registrationPromises.push(promise);
+    }
+
+    Promise.all(registrationPromises).then(results => {
+      // Filter out teams with no registrations
+      this.registrationsByTeam = results
+        .filter(r => r.registrations.length > 0)
+        .map(r => ({
+          team: r.team,
+          registrations: r.registrations
+        }));
+      this.registrationsLoading = false;
+    });
   }
 }

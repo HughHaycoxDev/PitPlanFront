@@ -47,4 +47,9 @@ export class AuthService {
     // Common JWT claim names for a username
     return payload.sub ?? payload.username ?? payload.name ?? null;
   }
+
+  getId(): number{
+    const payload = this.getPayload();
+    return payload.user_id
+  }
 }
