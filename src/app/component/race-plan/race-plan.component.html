@@ -2,4 +2,67 @@
 
   <app-sidebar></app-sidebar>
 
+    <div class="w-full px-6 py-4">
+
+        <div class="w-full bg-white rounded-2xl shadow-sm p-1 flex">
+
+        <button
+            (click)="setTab('overview')"
+            [ngClass]="activeTab === 'overview' ? 'bg-blue-600 text-white' : ''"
+            class="flex-1 text-center py-2 rounded-xl hover:bg-gray-100 transition"
+        >
+            Overview
+        </button>
+
+        <button
+            (click)="setTab('schedule')"
+            [ngClass]="activeTab === 'schedule' ? 'bg-blue-600 text-white' : ''"
+            class="flex-1 text-center py-2 rounded-xl hover:bg-gray-100 transition"
+        >
+            Schedule
+        </button>
+
+        <button
+            (click)="setTab('roster')"
+            [ngClass]="activeTab === 'roster' ? 'bg-blue-600 text-white' : ''"
+            class="flex-1 text-center py-2 rounded-xl hover:bg-gray-100 transition"
+        >
+            Roster
+        </button>
+
+        <button
+            (click)="setTab('availability')"
+            [ngClass]="activeTab === 'availability' ? 'bg-blue-600 text-white' : ''"
+            class="flex-1 text-center py-2 rounded-xl hover:bg-gray-100 transition"
+        >
+            Availability
+        </button>
+
+        </div>
+
+        <div class="mt-6">
+
+            @switch (activeTab) {
+
+                @case ('overview') {
+                    <app-race-plan-overview></app-race-plan-overview>
+                }
+
+                @case ('schedule') {
+                    <app-race-plan-schedule></app-race-plan-schedule>
+                }
+
+                @case ('roster') {
+                    <app-race-plan-roster></app-race-plan-roster>
+                }
+
+                @case ('availability') {
+                    <app-race-plan-availability></app-race-plan-availability>
+                }
+
+            }
+
+        </div>
+    </div>
+
 </div>
