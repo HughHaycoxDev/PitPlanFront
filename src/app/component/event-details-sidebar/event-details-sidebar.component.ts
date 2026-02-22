@@ -116,7 +116,8 @@ export class EventDetailsSidebarComponent implements OnInit {
     const racePlan = {
       team_id: this.selectedTeam?.team_id,
       car_id: this.selectedCar?.id,
-      time_slot: this.selectedTimeSlot?.slot_time
+      time_slot: this.selectedTimeSlot?.slot_time,
+      event_id: this.event.id
     } as RacePlan
 
     this.racePlanService.createRacePlan(racePlan).subscribe({
@@ -132,16 +133,23 @@ export class EventDetailsSidebarComponent implements OnInit {
 
   onViewRacePlan(): void {
 
-    this.racePlanService.getRacePlans().subscribe({
-      next: (data) => {
-        this.router.navigate(['/race-plan'], {
-           state: { racePlans: data } 
-          });
-      },
-      error: (err) => {
-        console.error('Failed to get race plans', err);
-      }
-    });
+    if (!this.selectedTeam) {
+      this.error = 'Team cannot be retrieved';
+      return;
+    } else {
+      this.racePlanService.getRacePlanByTeamAndEvent(this.selectedTeam.team_id, this.event.id).subscribe({
+            next: (data) => {
+              this.router.navigate(['/race-plan'], {
+                state: { racePlans: data } 
+                });
+            },
+            error: (err) => {
+              console.error('Failed to get race plans', err);
+            }
+      });
+    }
+
+    
 
   }
 }
