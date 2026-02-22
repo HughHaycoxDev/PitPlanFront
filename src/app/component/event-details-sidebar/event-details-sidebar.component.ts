@@ -121,12 +121,14 @@ export class EventDetailsSidebarComponent implements OnInit {
     } as RacePlan
 
     this.racePlanService.createRacePlan(racePlan).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-      error: (err) => {
-        console.error('Failed to create race plan', err);
-      }
+            next: (data) => {
+              this.router.navigate(['/race-plan'], {
+                state: { racePlans: data } 
+                });
+            },
+            error: (err) => {
+              console.error('Failed to create race plan', err);
+            }
     });
 
   }
