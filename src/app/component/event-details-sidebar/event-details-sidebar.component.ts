@@ -29,13 +29,13 @@ export class EventDetailsSidebarComponent implements OnInit {
   }>();
 
   teams: Team[] = [];
-  racePlans: RacePlan[] = [];
   cars: Car[] = [];
   timeSlots: TimeSlot[] = [];
 
   selectedTeam: Team | null = null;
   selectedCar: Car | null = null;
   selectedTimeSlot: TimeSlot | null = null;
+  racePlan: RacePlan | null = null;
 
   loading = false;
   error: string | null = null;
@@ -73,6 +73,16 @@ export class EventDetailsSidebarComponent implements OnInit {
       // Load cars for this team from the event
       // Assuming event.cars is an array of Car objects
       this.cars = this.event.cars || [];
+      // Search if any race plan exists for this team and event to let the user view it
+      this.racePlanService.getRacePlanByTeamAndEvent(this.selectedTeam.team_id, this.event.id).subscribe({
+        next: (data) => {
+          console.log(data);
+          this.racePlan = data;
+        },
+        error: (err) => {
+          this.racePlan = null;
+        }
+      });
     }
   }
 
