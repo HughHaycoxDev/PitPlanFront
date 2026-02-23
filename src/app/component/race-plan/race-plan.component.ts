@@ -26,8 +26,9 @@ export class RacePlanComponent {
 
   ngOnInit() {
     const navigation = window.history.state;
-    localStorage.setItem('racePlanId', navigation.racePlan?.id.toString() || '');
+    console.log('Navigation state:', navigation);
     console.log(navigation.racePlan);
+    localStorage.setItem('racePlan', JSON.stringify(navigation.racePlan));
   }
 
   activeTab: string = 'roster';

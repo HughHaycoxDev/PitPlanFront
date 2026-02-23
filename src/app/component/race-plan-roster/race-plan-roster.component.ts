@@ -29,12 +29,14 @@ export class RacePlanRosterComponent {
 
   ngOnInit() {
 
-    const racePlanId = localStorage.getItem('racePlanId');
+    const racePlan = localStorage.getItem('racePlan');
 
-    if (!racePlanId) {
-      console.error('RacePlanId not found in storage');
+    if (!racePlan) {
+      console.error('RacePlan not found in storage');
       return;
     }
+
+    const racePlanId = JSON.parse(racePlan).id;
 
     this.driverRosterService
       .getRaceRosterByRacePlan(+racePlanId)
@@ -53,11 +55,28 @@ export class RacePlanRosterComponent {
     console.log('Add driver clicked');
   }
 
-  updateDriver() {
-    console.log('Auto save driver changes');
+  updateDriver(driver: DriverRoster) {
+    console.log('Auto save driver changes', driver);
+    this.driverRosterService.updateDriverOnDriverRoster(driver).subscribe({
+      next: (response) => {
+        console.log('Driver updated successfully', response);
+      },
+      error: (error) => {
+        console.error('Error updating driver', error);
+      }
+    });
   }
 
-  deleteDriver(index: number) {
-    console.log('Delete driver', index);
+  deleteDriver(driver: DriverRoster) {
+    console.log('Delete driver', driver);
+    this.driverRosterService.deleteDriverOnDriverRoster(driver).subscribe({
+      next: (response) => {
+        console.log('Driver deleted successfully', response);
+        window.location.reload();
+      },
+      error: (error) => {
+        console.error('Error deleting driver', error);
+      }
+    });
   }
 }

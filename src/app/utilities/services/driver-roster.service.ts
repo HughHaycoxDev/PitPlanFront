@@ -19,4 +19,22 @@ export class DriverRosterService {
 
     return this.http.get<DriverRoster[]>(this.api + "list-by-race-plan/" + race_plan_id, {headers});
   }
+
+  updateDriverOnDriverRoster(driver: DriverRoster): Observable<DriverRoster> {
+    const token = this.auth.getToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    return this.http.put<DriverRoster>(this.api + "update/driver", driver, {headers});
+  }
+
+  deleteDriverOnDriverRoster(driver: DriverRoster): Observable<DriverRoster> {
+    const token = this.auth.getToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
+
+    return this.http.delete<DriverRoster>(this.api + "delete/driver/" + driver.id, {headers});
+  }
 }

@@ -6,7 +6,7 @@
 
     <button
       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition"
-      (click)="updateDriver()"
+      (click)="addDriver()"
     >
       + Add Driver
     </button>
@@ -45,7 +45,7 @@
         <input
             type="color"
             [(ngModel)]="driver.color"
-            (change)="updateDriver()"
+            (change)="updateDriver(driver)"
             class="w-8 h-8 cursor-pointer mx-auto"
         >
         </td>
@@ -55,7 +55,7 @@
           <td class="py-3 px-3">
             <input
               [(ngModel)]="driver.name"
-              (input)="updateDriver()"
+              (input)="updateDriver(driver)"
               class="border rounded-lg px-2 py-1 w-full"
             >
           </td>
@@ -72,7 +72,7 @@
             <input
               type="checkbox"
               [(ngModel)]="driver.fair_share"
-              (change)="updateDriver()"
+              (change)="updateDriver(driver)"
               class="h-4 w-4"
             >
           </td>
@@ -83,7 +83,7 @@
         <input
             type="number"
             [(ngModel)]="driver.gmt_offset"
-            (input)="updateDriver()"
+            (input)="updateDriver(driver)"
             class="border rounded-lg px-2 py-1 w-20 text-center mx-auto"
         >
         </td>
@@ -94,7 +94,7 @@
             <input
               type="number"
               [(ngModel)]="driver.i_rating"
-              (input)="updateDriver()"
+              (input)="updateDriver(driver)"
               class="border rounded-lg px-2 py-1 w-24 text-center mx-auto"
             >
           </td>
@@ -106,7 +106,7 @@
               type="number"
               step="0.01"
               [(ngModel)]="driver.lap_time"
-              (input)="updateDriver()"
+              (input)="updateDriver(driver)"
               class="border rounded-lg px-2 py-1 w-24 text-center mx-auto"
             >
           </td>
@@ -118,7 +118,7 @@
               type="number"
               step="0.1"
               [(ngModel)]="driver.factor"
-              (input)="updateDriver()"
+              (input)="updateDriver(driver)"
               class="border rounded-lg px-2 py-1 w-20 text-center mx-auto"
             >
           </td>
@@ -128,7 +128,7 @@
           <td class="py-3 px-3 text-center">
             <input
               [(ngModel)]="driver.preference"
-              (input)="updateDriver()"
+              (input)="updateDriver(driver)"
               class="border rounded-lg px-2 py-1 w-full"
             >
           </td>
@@ -137,7 +137,7 @@
           <!-- Delete -->
           <td class="py-3 px-3 text-center">
             <button
-              (click)="deleteDriver(i)"
+              (click)="deleteDriver(driver)"
               class="text-red-500 hover:text-red-700 text-lg"
             >
               <i class="bi bi-x"></i>
