@@ -1,22 +1,8 @@
-<aside class="h-screen w-64 bg-white dark:bg-gray-700 border-r border-gray-200 p-6 flex flex-col gap-6">
+<aside class="h-screen w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-6">
   
   <!-- Logo -->
-  <div class="flex justify-between items-center">
-
-    <div class="font-bold text-2xl text-blue-600 tracking-tight">
-      PitPlan
-    </div>
-
-    <button
-      (click)="toggleTheme()"
-      class="p-2 rounded-lg dark:bg-gray-700 transition flex items-center justify-center text-gray-800 dark:text-white"
-    >
-      <i
-        class="bi text-lg"
-        [ngClass]="isDark ? 'bi-brightness-high' : 'bi-moon'"
-      ></i>
-    </button>
-
+  <div class="font-bold text-2xl text-blue-600 tracking-tight">
+    PitPlan
   </div>
 
   <!-- Navigation -->
@@ -24,19 +10,19 @@
 
     <a routerLink="/dashboard"
        routerLinkActive="text-blue-600"
-       class="flex items-center gap-3 text-gray-700 hover:text-blue-600 dark:text-white">
+       class="flex items-center gap-3 text-gray-700 hover:text-blue-600">
        <i class="bi bi-house"></i>
       Home
     </a>
 
-    <p class="flex items-center gap-3 text-gray-700 hover:text-blue-600 dark:text-white">
+    <p class="flex items-center gap-3 text-gray-700 hover:text-blue-600">
       <i class="bi bi-people"></i>
       Teams
     </p>
 
     <ul class="flex flex-col gap-1 ml-6">
       @for (team of teams; track team.team_id) {
-        <li class="text-gray-600 text-sm dark:text-white">
+        <li class="text-gray-600 text-sm">
           {{ team.team_name }}
         </li>
       }
