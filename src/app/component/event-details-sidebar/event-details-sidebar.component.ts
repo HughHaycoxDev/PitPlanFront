@@ -143,7 +143,7 @@ export class EventDetailsSidebarComponent implements OnInit {
     this.racePlanService.createRacePlan(racePlan).subscribe({
             next: (data) => {
               this.router.navigate(['/race-plan'], {
-                state: { racePlans: data } 
+                state: { racePlan: data } 
                 });
             },
             error: (err) => {
@@ -162,17 +162,14 @@ export class EventDetailsSidebarComponent implements OnInit {
       this.racePlanService.getRacePlanByTeamAndEvent(this.selectedTeam.team_id, this.event.id).subscribe({
             next: (data) => {
               this.router.navigate(['/race-plan'], {
-                state: { racePlans: data } 
+                state: { racePlan: data } 
                 });
             },
             error: (err) => {
-              console.error('Failed to get race plans', err);
+              console.error('Failed to get race plan', err);
             }
       });
     }
-
-    
-
   }
 
   // View registrations functionality

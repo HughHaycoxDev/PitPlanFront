@@ -22,12 +22,16 @@ import { RacePlanScheduleComponent } from '../race-plan-schedule/race-plan-sched
   styleUrl: './race-plan.component.scss',
 })
 export class RacePlanComponent {
-  constructor() {
+  constructor() {}
+
+  ngOnInit() {
     const navigation = window.history.state;
-    console.log(navigation.racePlans);
+    console.log('Navigation state:', navigation);
+    console.log(navigation.racePlan);
+    localStorage.setItem('racePlan', JSON.stringify(navigation.racePlan));
   }
 
-  activeTab: string = 'overview';
+  activeTab: string = 'roster';
 
   setTab(tab: string) {
     this.activeTab = tab;

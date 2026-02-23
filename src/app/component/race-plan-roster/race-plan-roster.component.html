@@ -1,1 +1,157 @@
-<p>race-plan-roster works!</p>
+<div class="bg-white rounded-2xl shadow-sm p-6">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-semibold">DRIVER ROSTER</h2>
+
+    <button
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition"
+      (click)="addDriver()"
+    >
+      + Add Driver
+    </button>
+  </div>
+
+
+  <!-- Table -->
+  <div class="overflow-x-auto">
+
+    <table class="w-full">
+        <thead>
+        <tr class="border-b text-gray-500 text-sm uppercase">
+
+            <th class="py-3 px-3 text-center">Color</th>
+            <th class="py-3 px-3 text-left">Name</th>
+            <th class="py-3 px-3 text-center">Stints</th>
+            <th class="py-3 px-3 text-center">Fair Share</th>
+            <th class="py-3 px-3 text-center">GMT Offset</th>
+            <th class="py-3 px-3 text-center">iRating</th>
+            <th class="py-3 px-3 text-center">Lap Time (s)</th>
+            <th class="py-3 px-3 text-center">Factor</th>
+            <th class="py-3 px-3 text-left">Preference</th>
+            <th></th>
+
+        </tr>
+        </thead>
+
+
+      <tbody>
+
+        @for (driver of drivers; track driver.name; let i = $index) {
+
+        <tr class="border-b hover:bg-gray-50 transition">
+
+        <td class="py-3 px-3 text-center">
+        <input
+            type="color"
+            [(ngModel)]="driver.color"
+            (change)="updateDriver(driver)"
+            class="w-8 h-8 cursor-pointer mx-auto"
+        >
+        </td>
+
+
+          <!-- Name -->
+          <td class="py-3 px-3">
+            <input
+              [(ngModel)]="driver.name"
+              (input)="updateDriver(driver)"
+              class="border rounded-lg px-2 py-1 w-full"
+            >
+          </td>
+
+
+          <!-- Stints -->
+          <td class="py-3 px-3 text-center">
+            {{ driver.stints }}
+          </td>
+
+
+          <!-- Fair Share -->
+          <td class="py-3 px-3 text-center">
+            <input
+              type="checkbox"
+              [(ngModel)]="driver.fair_share"
+              (change)="updateDriver(driver)"
+              class="h-4 w-4"
+            >
+          </td>
+
+
+          <!-- GMT -->
+        <td class="py-3 px-3 text-center">
+        <input
+            type="number"
+            [(ngModel)]="driver.gmt_offset"
+            (input)="updateDriver(driver)"
+            class="border rounded-lg px-2 py-1 w-20 text-center mx-auto"
+        >
+        </td>
+
+
+          <!-- iRating -->
+          <td class="py-3 px-3 text-center">
+            <input
+              type="number"
+              [(ngModel)]="driver.i_rating"
+              (input)="updateDriver(driver)"
+              class="border rounded-lg px-2 py-1 w-24 text-center mx-auto"
+            >
+          </td>
+
+
+          <!-- Lap Time -->
+          <td class="py-3 px-3  text-center">
+            <input
+              type="number"
+              step="0.01"
+              [(ngModel)]="driver.lap_time"
+              (input)="updateDriver(driver)"
+              class="border rounded-lg px-2 py-1 w-24 text-center mx-auto"
+            >
+          </td>
+
+
+          <!-- Factor -->
+          <td class="py-3 px-3 text-center">
+            <input
+              type="number"
+              step="0.1"
+              [(ngModel)]="driver.factor"
+              (input)="updateDriver(driver)"
+              class="border rounded-lg px-2 py-1 w-20 text-center mx-auto"
+            >
+          </td>
+
+
+          <!-- Preference -->
+          <td class="py-3 px-3 text-center">
+            <input
+              [(ngModel)]="driver.preference"
+              (input)="updateDriver(driver)"
+              class="border rounded-lg px-2 py-1 w-full"
+            >
+          </td>
+
+
+          <!-- Delete -->
+          <td class="py-3 px-3 text-center">
+            <button
+              (click)="deleteDriver(driver)"
+              class="text-red-500 hover:text-red-700 text-lg"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
