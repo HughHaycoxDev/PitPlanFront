@@ -24,6 +24,7 @@ interface Driver {
 export class RacePlanRosterComponent {
 
   drivers: DriverRoster[] = [];
+  racePlanId: number = 0;
 
   constructor(private driverRosterService: DriverRosterService) {}
 
@@ -37,6 +38,7 @@ export class RacePlanRosterComponent {
     }
 
     const racePlanId = JSON.parse(racePlan).id;
+    this.racePlanId = racePlanId;
 
     this.driverRosterService
       .getRaceRosterByRacePlan(+racePlanId)
@@ -53,6 +55,15 @@ export class RacePlanRosterComponent {
 
   addDriver() {
     console.log('Add driver clicked');
+    this.driverRosterService.createDriverOnDriverRoster(this.racePlanId).subscribe({
+      next: (response) => {
+        console.log('Driver created successfully', response);
+        window.location.reload();
+      },
+      error: (error) => {
+        console.error('Error creating driver', error);
+      }
+    });
   }
 
   updateDriver(driver: DriverRoster) {
